@@ -19,7 +19,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build FlatGeobuf file
-        run: python geojson_to_flatgeobuf.py
+        run: python preprocess_data.py
 
       - name: Deploy to server
         env:
