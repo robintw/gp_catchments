@@ -1,7 +1,9 @@
 import csv
 import json
+import re
 import tempfile
 import zipfile
+from datetime import date
 from pathlib import Path
 from urllib.request import urlretrieve
 
@@ -10,7 +12,9 @@ from shapely.geometry import shape, MultiPolygon
 
 CATCHMENTS_URL = "https://www.healthgis.nhs.uk/assets/shared/GP_catchments_data.zip"
 CSV_URL = "https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=epraccur"
-OUTPUT_FILE = Path(__file__).parent / "public" / "gp_catchments.fgb"
+PUBLIC_DIR = Path(__file__).parent / "public"
+OUTPUT_FILE = PUBLIC_DIR / "gp_catchments.fgb"
+HTML_FILE = PUBLIC_DIR / "index.html"
 
 
 def download_data(tmp_dir: Path):
@@ -102,6 +106,17 @@ def main():
         gdf = gpd.GeoDataFrame(records, geometry="geometry", crs="EPSG:4326")
         gdf.to_file(OUTPUT_FILE, driver="FlatGeobuf")
         print(f"Wrote {len(gdf)} features to {OUTPUT_FILE}")
+
+    # Update date in HTML
+    today = date.today().strftime("%-d %B %Y")
+    html = HTML_FILE.read_text()
+    html = re.sub(
+        r'(<span id="data-date">)[^<]*(</span>)',
+        rf"\g<1>{today}\g<2>",
+        html,
+    )
+    HTML_FILE.write_text(html)
+    print(f"Updated data date to {today}")
 
 
 if __name__ == "__main__":
