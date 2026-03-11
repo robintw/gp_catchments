@@ -1,0 +1,5 @@
+*.geojson
+epraccur.csv
+public/gp_catchments.fgb
+.DS_Store
+GP_catchments_data_old/
